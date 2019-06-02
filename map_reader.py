@@ -33,7 +33,7 @@ class MapDataset(dg.MultiSlotDataGenerator):
         self.weather_feature_list = ["max_temp", "min_temp", "wea", "wind"]
         self.hash_dim = 1000001
         self.train_idx_ = 2000000
-        #carefully set if you change the features 
+        #carefully set if you change the features
         self.categorical_range_ = range(0, 22)
 
     #process one instance
@@ -47,7 +47,6 @@ class MapDataset(dg.MultiSlotDataGenerator):
         else:
             profile.extend([0]*(10-len_profile))
             user_profile_feature = profile
-        
         if len(profile) > 1 or (len(profile) == 1 and profile[0] != 0):
             for p in profile:
                 if p >= 1 and p <= 65:
@@ -123,7 +122,7 @@ class MapDataset(dg.MultiSlotDataGenerator):
             batch_size=batch)
         return batch_iter
 
-    #generate inputs for trainig 
+    #generate inputs for trainig
     def generate_sample(self, line):
         def data_iter():
             dense_feature, sparse_feature, sparse_feature_fm, label = self._process_line(line)

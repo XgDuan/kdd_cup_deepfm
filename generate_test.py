@@ -118,7 +118,7 @@ def test():
     epochs = 1
 
     for i in range(epochs):
-        cur_model_path = args.model_path + "/epoch" + str(1) + ".model"
+        cur_model_path = args.model_path + "/epoch" + str(10) + ".model"
         with open("./testres/res" + str(i), 'w') as r:
             with fluid.scope_guard(test_scope):
                 [inference_program, feed_target_names, fetch_targets] = \
@@ -132,12 +132,10 @@ def test():
                     loss_val, auc_val, accuracy, predict, _ = exe.run(inference_program,
                                                 feed=feed_dict,
                                                 fetch_list=fetch_targets, return_numpy=False)
-
                     x = np.array(predict)
                     for j in range(x.shape[0]):
                         r.write(str(x[j][1]))
                         r.write("\n")
-
 
 if __name__ == '__main__':
     test()

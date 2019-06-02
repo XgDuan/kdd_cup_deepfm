@@ -18,6 +18,7 @@ import math
 user_profile_dim = 65
 dense_feature_dim = 3
 
+
 def ctr_deepfm_dataset(dense_feature, context_feature, context_feature_fm, label,
                        embedding_size, sparse_feature_dim):
     def dense_fm_layer(input, emb_dict_size, factor_size, fm_param_attr):
@@ -35,13 +36,11 @@ def ctr_deepfm_dataset(dense_feature, context_feature, context_feature_fm, label
         second_order = 0.5 * (input_mul_factor_square - input_square_mul_factor_square)
         return first_order, second_order
 
-
     dense_fm_param_attr = fluid.param_attr.ParamAttr(name="DenseFeatFactors",
                                                      initializer=fluid.initializer.Normal(
                                                          scale=1 / math.sqrt(dense_feature_dim)))
     dense_fm_first, dense_fm_second = dense_fm_layer(
         dense_feature, dense_feature_dim, 16, dense_fm_param_attr)
-
 
     def sparse_fm_layer(input, emb_dict_size, factor_size, fm_param_attr):
 
@@ -66,7 +65,7 @@ def ctr_deepfm_dataset(dense_feature, context_feature, context_feature_fm, label
                                                       initializer=fluid.initializer.Normal(
                                                           scale=1 / math.sqrt(sparse_feature_dim)))
 
-    #data = fluid.layers.data(name='ids', shape=[1], dtype='float32')
+    # data = fluid.layers.data(name='ids', shape=[1], dtype='float32')
     sparse_fm_first, sparse_fm_second = sparse_fm_layer(
         context_feature_fm, sparse_feature_dim, 16, sparse_fm_param_attr)
 
@@ -88,11 +87,11 @@ def ctr_deepfm_dataset(dense_feature, context_feature, context_feature_fm, label
 
     deep = deep_net(concated)
 
-    predict = fluid.layers.fc(input=[deep, sparse_fm_first, sparse_fm_second, dense_fm_first, dense_fm_second], size=2, act="softmax",
-                              param_attr=fluid.ParamAttr(initializer=fluid.initializer.Normal(
+    predict = fluid.layers.fc(input=[deep, sparse_fm_first, sparse_fm_second, dense_fm_first, dense_fm_second], size=2,
+                              act="softmax", param_attr=fluid.ParamAttr(initializer=fluid.initializer.Normal(
                                   scale=1 / math.sqrt(deep.shape[1])), learning_rate=0.01))
 
-    #similarity_norm = fluid.layers.sigmoid(fluid.layers.clip(predict, min=-15.0, max=15.0), name="similarity_norm")
+    # similarity_norm = fluid.layers.sigmoid(fluid.layers.clip(predict, min=-15.0, max=15.0), name="similarity_norm")
 
     cost = fluid.layers.cross_entropy(input=predict, label=label)
 
@@ -116,8 +115,4 @@ def deep_net(concated, lr_x=0.0001):
             param_attr=fluid.ParamAttr(learning_rate=lr_x * 0.5))
 
         fc_layers_input.append(fc)
-    #w_res = fluid.layers.create_parameter(shape=[353, 16], dtype='float32', name="w_res")
-    #high_path = fluid.layers.matmul(concated, w_res)
-
-    #return fluid.layers.elementwise_add(high_path, fc_layers_input[-1])
     return fc_layers_input[-1]
